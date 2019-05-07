@@ -107,13 +107,14 @@ class win(wx.Frame):
     output_data = []
 
     def plot_linear_regression(self, year):
+        self.output_des.SetLabel("LOADING")
         ax = self.figure.add_subplot(111)
         ax.cla()
         ax.set_ylabel('Temperature (degress(c))')
         ax.set_xlabel('Season')
         ax.legend()
-        ax.set_title('Prediction and Reflection for ' +beautify_title(self.current_selection) + ' ' + year + ' - Linear Regression')
-        ax.set_facecolor((0, 0, 0))
+        ax.set_title('Prediction and Reflection for ' +beautify_title(self.current_selection) + ' ' + str(year) + ' - Linear Regression')
+        ax.set_facecolor((0.7, 0.7, 0.7))
         ax.set_ylim(bottom=-20)
 
         n_wi = l_r.plot(self.d, int(year), 'winter');
@@ -121,7 +122,14 @@ class win(wx.Frame):
         n_su = l_r.plot(self.d, int(year), 'summer');
         n_au = l_r.plot(self.d, int(year), 'autumn');
 
+        o_wi = knn.construct_season_avg(self.d, int(year), "winter")
+        o_sp = knn.construct_season_avg(self.d, int(year), "spring")
+        o_su = knn.construct_season_avg(self.d, int(year), "summer")
+        o_au = knn.construct_season_avg(self.d, int(year), "autumn")
+
         n_data = [None, n_wi, None, None, n_sp, None, None, n_su, None, None, n_au, None]
+        o_data = [None, o_wi, None, None, o_sp, None, None, o_su, None, None, o_au, None]
+
         win.output_data = n_data
 
         f_data = [0, None, 2, 3, None, 5, 6, None, 8, 9, None, 11]
@@ -134,36 +142,38 @@ class win(wx.Frame):
         f_data[0] = knn.get_max_temperature(self.d, 12, int(year))
 
         ax.plot(['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], n_data, 'rx')
+        ax.plot(['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], o_data, 'bx')
         ax.plot(['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], f_data, 'gx')
 
         y=int(year)
 
         sp_bar = knn.get_average_max(self.d, 10, y, 'spring')
-        su_bar = knn.get_average_min(self.d, 10, y, 'summer')
-        w_bar = knn.get_average_min(self.d, 10, y, 'winter')
-        a_bar = knn.get_average_min(self.d, 10, y, 'autumn')
+        su_bar = knn.get_average_max(self.d, 10, y, 'summer')
+        w_bar = knn.get_average_max(self.d, 10, y, 'winter')
+        a_bar = knn.get_average_max(self.d, 10, y, 'autumn')
 
         sp_bar_low = knn.get_average_min(self.d, 10, y, 'spring')
         su_bar_low = knn.get_average_min(self.d, 10, y, 'summer')
         w_bar_low = knn.get_average_min(self.d, 10, y, 'winter')
         a_bar_low = knn.get_average_min(self.d, 10, y, 'autumn')
 
-        print(sp_bar_low);
-        ax.text(0, sp_bar + 0.01, "SPRING", fontsize=8)
-        ax.text(0, su_bar + 0.01, "SUMMER", fontsize=8)
-        ax.text(0, w_bar + 0.01, "WINTER", fontsize=8)
-        ax.text(0, a_bar + 0.01, "AUTUMN", fontsize=8)
+        ax.text(0, sp_bar+0.01, "SPRING", fontsize=8)
+        ax.text(0, su_bar+0.01, "SUMMER", fontsize=8)
+        ax.text(0, w_bar+0.01, "WINTER", fontsize=8)
+        ax.text(0, a_bar+0.01, "AUTUMN", fontsize=8)
 
-        ax.text(11, sp_bar_low + 0.01, "SPRING_LOW", fontsize=8)
-        ax.text(11, su_bar_low + 0.01, "SUMMER_LOW", fontsize=8)
-        ax.text(11, w_bar_low + 0.01, "WINTER_LOW", fontsize=8)
-        ax.text(11, a_bar_low + 0.01, "AUTUMN_LOW", fontsize=8)
+        ax.text(11, sp_bar_low+0.01, "SPRING_LOW", fontsize=8)
+        ax.text(11, su_bar_low+0.01, "SUMMER_LOW", fontsize=8)
+        ax.text(11, w_bar_low+0.01, "WINTER_LOW", fontsize=8)
+        ax.text(11, a_bar_low+0.01, "AUTUMN_LOW", fontsize=8)
+
 
         alpha = 0.3
-        rect_sp = patches.Rectangle((0, sp_bar_low), 12, sp_bar - sp_bar_low, linewidth=0, edgecolor='#ff00ff',facecolor='#ff00ff', alpha=alpha)
-        rect_su = patches.Rectangle((0, su_bar_low), 12, su_bar - su_bar_low, linewidth=0, edgecolor='#00ffff',facecolor='#00ffff', alpha=alpha)
-        rect_a = patches.Rectangle((0, a_bar_low), 12, a_bar - a_bar_low, linewidth=0, edgecolor='#ffffff00', facecolor='b', alpha=alpha)
-        rect_w = patches.Rectangle((0, w_bar_low), 12, w_bar - w_bar_low, linewidth=0, edgecolor='#ffffff00', facecolor='#ffff00', alpha=alpha)
+
+        rect_sp = patches.Rectangle((0, sp_bar_low), 12, sp_bar-sp_bar_low, linewidth=0, edgecolor='#ff00ff', facecolor='#ff00ff', alpha=alpha)
+        rect_su = patches.Rectangle((0, su_bar_low), 12, su_bar-su_bar_low, linewidth=0, edgecolor='#00ffff', facecolor='#00ffff', alpha=alpha)
+        rect_a = patches.Rectangle((0, a_bar_low), 12, a_bar-a_bar_low, linewidth=0, edgecolor='#ffffff00', facecolor='b', alpha=alpha)
+        rect_w = patches.Rectangle((0, w_bar_low), 12, w_bar-w_bar_low, linewidth=0, edgecolor='#ffffff00', facecolor='#ffff00', alpha=alpha)
 
         ax.add_patch(rect_sp)
         ax.add_patch(rect_su)
@@ -177,11 +187,13 @@ class win(wx.Frame):
         ax.legend(handles=[predict_patch, actual_patch, fade_patch])
 
         ax.axis([0, 11, 0, 30])
-        self.output_des.SetLabel(win.display_results(year))
+        self.output_des.SetLabel(win.display_results(self, year))
 
         self.canvas.draw()
 
     def plot(self, year):
+        self.output_des.SetLabel("LOADING")
+
         y = int(year)
         k = 5
         max_year = self.d.tail(1).iloc[0]['yyyy']
@@ -237,7 +249,7 @@ class win(wx.Frame):
 
         #TODO fix prediction for 2019
 
-        ax.set_facecolor((0, 0, 0))
+        ax.set_facecolor((0.7, 0.7, 0.7))
         ax.set_ylim(bottom=-20)
         ax.axis([0, 11, 0, 30])
 
@@ -295,12 +307,12 @@ class win(wx.Frame):
 
             check_date = wx.TextEntryDialog(None, 'enter date')
             check_date.ShowModal()
-            date = check_date.GetValue()
+            date = int(check_date.GetValue())
 
             try:
                 val = int(date)
-                if int(date) > int(max_year):
-                    check_selection = wx.MessageDialog(None, "Please enter a date before " + max_year + 1)
+                if int(date) > int(max_year+1):
+                    check_selection = wx.MessageDialog(None, "Please enter a date before " + str(max_year + 1))
                     check_selection.ShowModal()
                 else:
                     self.plot(val)
@@ -327,8 +339,8 @@ class win(wx.Frame):
 
             try:
                 val = int(date)
-                if int(date) >int(max_year):
-                    check_selection = wx.MessageDialog(None, "Please enter a date before " + max_year + 1)
+                if int(date) >int(max_year+1):
+                    check_selection = wx.MessageDialog(None, "Please enter a date before " + str(max_year + 1))
                     check_selection.ShowModal()
                 else:
                     self.plot_linear_regression(val)
